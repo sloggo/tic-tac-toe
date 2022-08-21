@@ -83,7 +83,7 @@ const Player = (sign) => {
                 if(gameBoard.checkEnd() === 'o' || gameBoard.checkEnd() === 'x'){
                     (gameBoard.checkEnd() === sign)? winner = true: winner = false;
                 } else if(gameBoard.checkEnd() === 'tie'){
-                    winner = falses
+                    winner = false
                 }
 
                 gameBoard.roundFinish()
