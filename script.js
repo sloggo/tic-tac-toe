@@ -1,3 +1,7 @@
+const game = (function () {
+
+});
+
 const gameBoard = (function (document){
     const boardTiles = ['o', 'x', '',
                    '', '', '',
@@ -5,7 +9,7 @@ const gameBoard = (function (document){
     
     const $board = document.querySelector('.gameBoard')
     
-    const renderBoard = () =>{
+    const renderBoard = () => {
         console.log(boardTiles)
 
         for(tile of boardTiles){
@@ -30,9 +34,21 @@ const gameBoard = (function (document){
         }
     }
 
+    const changeTile = (player, tile) => boardTiles[tile] = player.sign
+
     return{
         renderBoard
     }
-})(document)
+})(document);
 
-gameBoard.renderBoard()
+const Player = (name, sign) => {
+    const getName = () => name;
+    const getSign = () => sign;
+
+    return{
+        getName,
+        getSign
+    }
+};
+
+gameBoard.renderBoard();
