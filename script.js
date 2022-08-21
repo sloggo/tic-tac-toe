@@ -61,12 +61,14 @@ const gameBoard = (function (document){
         printBoard,
         setTile,
         getActivePlayer,
-        roundFinish
+        roundFinish,
+        checkEnd
     }
 })(document);
 
 const Player = (sign) => {
     const ownedTiles = [];
+    let winner = false;
 
     const move = (tile) => {
         if(gameBoard.getActivePlayer() === sign){
@@ -77,6 +79,13 @@ const Player = (sign) => {
 
                 gameBoard.setTile(sign, tile)
                 console.log(`${sign} takes tile ${tile+1}!`)
+
+                if(gameBoard.checkEnd() === 'o' || gameBoard.checkEnd() === 'x'){
+                    (gameBoard.checkEnd() === sign)? winner = true: winner = false;
+                } else if(gameBoard.checkEnd() === 'tie'){
+                    winner = falses
+                }
+
                 gameBoard.roundFinish()
 
             } else{
