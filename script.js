@@ -12,7 +12,7 @@ const gameBoard = (function (document){
                         [1, 4, 7],
                         [2, 5, 9],
 
-                        [0, 4, 9], //diagonal
+                        [0, 4, 8], //diagonal
                         [2, 4, 6]
                     ]
 
