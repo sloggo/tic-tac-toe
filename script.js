@@ -7,41 +7,18 @@ const gameBoard = (function (document){
 
     const roundFinish = () => {
         console.log(`Round ${round} finished`)
-        gameBoard.printBoard()
+        
         round++
 
         console.log(`Round ${round}:`)
     }
-    // const renderBoard = () => {
-    //     console.log(boardTiles)
-
-    //     for(tile of boardTiles){
-    //         const $tileDivider = document.createElement('div')
-    //         $tileDivider.classList.add('tile')
-            
-    //         switch (tile){
-    //             case '':
-    //                 $tileDivider.innerHTML += '&nbsp;';
-    //                 break;
-                
-    //             case 'x':
-    //                 $tileDivider.textContent = 'x';
-    //                 break;
-
-    //             case 'o':
-    //                 $tileDivider.textContent = 'o';
-    //                 break;
-    //         }
-
-    //         $board.appendChild($tileDivider)
-    //     }
-    // }
+    
     const validateMove = (tile) => {
         return ((boardTiles[tile] === '') ? true : false);
     }
 
-    const printBoard = () => {
-        console.log(boardTiles)
+    const getBoard = () => {
+        return boardTiles
     }
 
     const setTile = (sign, tile) => {
@@ -49,69 +26,124 @@ const gameBoard = (function (document){
     }
  
     const getActivePlayer = () => {
-        return ((round % 2)? 'x': 'o')
+        if(round % 2 === 0){
+            return playerO
+        } else{
+            return playerX
+        }
     }
 
     const checkEnd = () => {
 
     }
 
-    return{
-        validateMove,
-        printBoard,
-        setTile,
-        getActivePlayer,
-        roundFinish,
-        checkEnd
-    }
-})(document);
-
-const Player = (sign) => {
-    const ownedTiles = [];
-    let winner = false;
-
     const move = (tile) => {
-        if(gameBoard.getActivePlayer() === sign){
+        let player = getActivePlayer()
+        
+        if(validateMove(tile)){
+            player.ownedTiles.push(tile);
 
-            if(gameBoard.validateMove(tile)){
-                
-                ownedTiles.push(tile)
-
-                gameBoard.setTile(sign, tile)
-                console.log(`${sign} takes tile ${tile+1}!`)
-
-                if(gameBoard.checkEnd() === 'o' || gameBoard.checkEnd() === 'x'){
-                    (gameBoard.checkEnd() === sign)? winner = true: winner = false;
-                } else if(gameBoard.checkEnd() === 'tie'){
-                    winner = false
-                }
-
-                gameBoard.roundFinish()
-
-            } else{
-
-                console.log('Invalid move')
-
-            }
-
-        } else if(!(gameBoard.getActivePlayer() === sign)) {
-
-            console.log(`Not ${sign}'s go!`)
-
+            gameBoard.setTile(player.sign, tile)
+            displayController.renderBoard()
+            console.log(`${player.sign} takes tile ${tile+1}!`)
+            roundFinish()
         }
     }
 
     return{
-        sign,
+        validateMove,
+        getBoard,
+        setTile,
+        getActivePlayer,
+        roundFinish,
+        checkEnd,
         move
     }
+})(document);
+
+const Player = (sign) => {
+    let ownedTiles = [];
+    let winner = false;
+
+    // const move = (tile) => {
+    //     if(gameBoard.getActivePlayer() === sign){
+
+    //         if(gameBoard.validateMove(tile)){
+                
+    //             ownedTiles.push(tile)
+
+    //             gameBoard.setTile(sign, tile)
+    //             displayController.renderBoard()
+    //             console.log(`${sign} takes tile ${tile+1}!`)
+
+    //             if(gameBoard.checkEnd() === 'o' || gameBoard.checkEnd() === 'x'){
+    //                 (gameBoard.checkEnd() === sign)? winner = true: winner = false;
+
+    //                 //displayController.win(sign)
+
+    //                 //gameBoard.reset()
+    //             } else if(gameBoard.checkEnd() === 'tie'){
+    //                 winner = false
+    //             }
+
+    //             gameBoard.roundFinish()
+
+    //         } else{
+
+    //             console.log('Invalid move')
+
+    //         }
+
+    //     } else if(!(gameBoard.getActivePlayer() === sign)) {
+
+    //         console.log(`Not ${sign}'s go!`)
+
+    //     }
+    // }
+
+    return{
+        sign,
+        ownedTiles
+    }
 };
+
+const displayController = (function (){
+    const $gameBoard = document.querySelector('.gameBoard');
+
+    const renderBoard = () => {
+        const boardArray = gameBoard.getBoard()
+
+        $gameBoard.innerHTML = '';
+
+        boardArray.forEach((tile, index) => {
+            const $tileContainer = document.createElement('div');
+            const $tileSign = document.createElement('p')
+
+            $tileContainer.classList.add('tile');
+            $tileSign.textContent = tile;
+            $tileContainer.appendChild($tileSign)
+            $tileContainer.setAttribute('tile-id', index);
+
+            $tileContainer.addEventListener('click', (e)=>{
+                console.log(`click tile ${index}`)
+
+                gameBoard.move(index)
+
+            })
+
+            $gameBoard.appendChild($tileContainer);
+        })
+    }
+
+    return {
+        renderBoard,
+    }
+})()
 
 let playerX = Player('x')
 let playerO = Player('o')
 
-playerX.move(7)
-playerO.move(2)
+displayController.renderBoard()
 
 
 
