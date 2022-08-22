@@ -47,21 +47,25 @@ const gameBoard = (function (document){
     }
 
     const checkEnd = () => {
-        let isWinner = false
+        let winner = '';
         winCombos.forEach(combo => {
 
             if(combo.every(item => playerO.ownedTiles.includes(item))){
                 console.log(`${playerO.sign} wins`)
-                return playerO;
+                winner = playerO
             } else if(combo.every(item => playerX.ownedTiles.includes(item))){
                 console.log(`${playerX.sign} wins`)
-                return playerX;
-            } else if(!boardTiles.includes('')){
-                console.log('tie')
-                return 'tie'
+                winner = playerX
             }
 
         })
+
+        if(!winner){
+            (!boardTiles.includes(''))? winner = 'tie': winner = 'error'
+        }
+
+        return winner;
+
     }
 
     const move = (tile) => {
