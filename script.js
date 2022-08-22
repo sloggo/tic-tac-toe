@@ -3,6 +3,19 @@ const gameBoard = (function (document){
                    '', '', '',
                    '', '', ''];
 
+    const winCombos = [ 
+                        [0, 1, 2],
+                        [3, 4, 5],
+                        [6, 7, 9], //horizontal
+
+                        [0, 3, 6],//vertical
+                        [1, 4, 7],
+                        [2, 5, 9],
+
+                        [0, 4, 9], //diagonal
+                        [2, 4, 6]
+                    ]
+
     let round = 1
 
     const roundFinish = () => {
@@ -34,7 +47,21 @@ const gameBoard = (function (document){
     }
 
     const checkEnd = () => {
+        let isWinner = false
+        winCombos.forEach(combo => {
 
+            if(combo.every(item => playerO.ownedTiles.includes(item))){
+                console.log(`${playerO.sign} wins`)
+                return playerO;
+            } else if(combo.every(item => playerX.ownedTiles.includes(item))){
+                console.log(`${playerX.sign} wins`)
+                return playerX;
+            } else if(!boardTiles.includes('')){
+                console.log('tie')
+                return 'tie'
+            }
+
+        })
     }
 
     const move = (tile) => {
@@ -43,20 +70,33 @@ const gameBoard = (function (document){
         if(validateMove(tile)){
             player.ownedTiles.push(tile);
 
-            gameBoard.setTile(player.sign, tile)
+            setTile(player.sign, tile)
             displayController.renderBoard()
             console.log(`${player.sign} takes tile ${tile+1}!`)
-            roundFinish()
+
+            console.log(player.ownedTiles)
+
+            if(checkEnd() === playerO){
+                playerO.winner = true;
+                playerX.winner = false;
+
+                //displayController.win()
+            } else if(checkEnd() === playerX){
+                playerX.winner = true;
+                playerO.winner = false;
+                
+            } else if(checkEnd() === 'tie'){
+                playerX.winner = false;
+                playerO.winner = false;
+            } else{
+                roundFinish()
+            }
+
         }
     }
 
     return{
-        validateMove,
         getBoard,
-        setTile,
-        getActivePlayer,
-        roundFinish,
-        checkEnd,
         move
     }
 })(document);
@@ -103,7 +143,8 @@ const Player = (sign) => {
 
     return{
         sign,
-        ownedTiles
+        ownedTiles,
+        winner
     }
 };
 
