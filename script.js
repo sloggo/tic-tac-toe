@@ -1,5 +1,5 @@
 const gameBoard = (function (document){
-    const boardTiles = ['', '', '',
+    let boardTiles = ['', '', '',
                    '', '', '',
                    '', '', ''];
 
@@ -18,7 +18,23 @@ const gameBoard = (function (document){
 
     let round = 1
 
+    let winner = ''
+
     let disableInput = false;
+
+    const startGame = () => {
+        boardTiles = ['', '', '',
+        '', '', '',
+        '', '', ''];
+
+        round = 1
+        
+        disableInput= false;
+
+        playerO.reset();
+        playerX.reset();
+        displayController.renderBoard();
+    }
 
     const roundFinish = () => {
         console.log(`Round ${round} finished`)
@@ -107,11 +123,23 @@ const gameBoard = (function (document){
         }
     }
 
+    const getWinner = () => {
+        if(playerX.winner){
+            return playerX;
+        } else if(playerO.winner){
+            return playerO;
+        } else{
+            return null;
+        }
+    }
+
     return{
         getBoard,
         move,
         getActivePlayer,
-        disableInput
+        disableInput,
+        startGame,
+        getWinner
     }
 })(document);
 
@@ -153,12 +181,18 @@ const Player = (sign) => {
     //         console.log(`Not ${sign}'s go!`)
 
     //     }
-    // }
+    //
+    const reset = () => {
+        ownedTiles.length = 0;
+        console.log('reset tiles', ownedTiles)
+        winner = false;
+    }
 
     return{
         sign,
         ownedTiles,
-        winner
+        winner,
+        reset
     }
 };
 
@@ -212,11 +246,18 @@ const displayController = (function (){
         $endContainer.appendChild($h1)
 
         const $p = document.createElement('p')
-        $p.textContent = 'winner'
+        $p.textContent = gameBoard.getWinner().sign.toUpperCase()+' wins!'
         $endContainer.appendChild($p)
 
         const $button = document.createElement('button')
         $button.textContent = 'play again'
+
+        $button.addEventListener('click', (e) => {
+            $endContainer.remove()
+
+            gameBoard.startGame()
+        })
+
         $endContainer.appendChild($button)
 
         $body.appendChild($endContainer);
