@@ -18,12 +18,16 @@ const gameBoard = (function (document){
 
     let round = 1
 
+    let disableInput = false;
+
     const roundFinish = () => {
         console.log(`Round ${round} finished`)
         
         round++
 
         console.log(`Round ${round}:`)
+
+        displayController.updateActivePlayer()
     }
     
     const validateMove = (tile) => {
@@ -47,25 +51,38 @@ const gameBoard = (function (document){
     }
 
     const checkEnd = () => {
-        let winner = '';
+        let winCombo = [];
+        let end = false;
         winCombos.forEach(combo => {
 
             if(combo.every(item => playerO.ownedTiles.includes(item))){
                 console.log(`${playerO.sign} wins`)
-                winner = playerO
+                playerO.winner = true;
+                playerX.winner = false;
+                winCombo = combo
+
+                end= true
+
             } else if(combo.every(item => playerX.ownedTiles.includes(item))){
                 console.log(`${playerX.sign} wins`)
-                winner = playerX
+                playerO.winner = false;
+                playerX.winner = true;
+                winCombo = combo
+
+                end= true
             }
 
         })
 
-        if(!winner){
-            (!boardTiles.includes(''))? winner = 'tie': winner = 'error'
+        if(playerO.winner === false && playerX.winner === false){
+           if(!boardTiles.includes('')){
+            end = true
+           } else{
+            end = false;
+           }
         }
 
-        return winner;
-
+        return end
     }
 
     const move = (tile) => {
@@ -80,19 +97,10 @@ const gameBoard = (function (document){
 
             console.log(player.ownedTiles)
 
-            if(checkEnd() === playerO){
-                playerO.winner = true;
-                playerX.winner = false;
-
-                //displayController.win()
-            } else if(checkEnd() === playerX){
-                playerX.winner = true;
-                playerO.winner = false;
-                
-            } else if(checkEnd() === 'tie'){
-                playerX.winner = false;
-                playerO.winner = false;
-            } else{
+            if(checkEnd()){
+                disableInput = true
+                displayController.gameEnd()
+            }else{
                 roundFinish()
             }
 
@@ -101,7 +109,9 @@ const gameBoard = (function (document){
 
     return{
         getBoard,
-        move
+        move,
+        getActivePlayer,
+        disableInput
     }
 })(document);
 
@@ -153,9 +163,11 @@ const Player = (sign) => {
 };
 
 const displayController = (function (){
+    const $body = document.querySelector('body');
     const $gameBoard = document.querySelector('.gameBoard');
 
     const renderBoard = () => {
+        updateActivePlayer()
         const boardArray = gameBoard.getBoard()
 
         $gameBoard.innerHTML = '';
@@ -172,16 +184,48 @@ const displayController = (function (){
             $tileContainer.addEventListener('click', (e)=>{
                 console.log(`click tile ${index}`)
 
-                gameBoard.move(index)
+                if(gameBoard.disableInput === false){
+                    gameBoard.move(index)
+                }
 
             })
 
             $gameBoard.appendChild($tileContainer);
         })
+
+    }
+
+    const updateActivePlayer = () => {
+        let player = gameBoard.getActivePlayer();
+        const $currentPlayerSign = document.querySelector('#currentPlayerSign');
+
+        $currentPlayerSign.textContent = player.sign;
+    }
+
+    const gameEnd = () => {
+        console.log('gameend')
+        const $endContainer = document.createElement('div')
+        $endContainer.classList.add('endContainer')
+
+        const $h1 = document.createElement('h1')
+        $h1.textContent = 'Game over!'
+        $endContainer.appendChild($h1)
+
+        const $p = document.createElement('p')
+        $p.textContent = 'winner'
+        $endContainer.appendChild($p)
+
+        const $button = document.createElement('button')
+        $button.textContent = 'play again'
+        $endContainer.appendChild($button)
+
+        $body.appendChild($endContainer);
     }
 
     return {
         renderBoard,
+        updateActivePlayer,
+        gameEnd
     }
 })()
 
