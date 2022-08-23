@@ -90,12 +90,8 @@ const gameBoard = (function (document){
 
         })
 
-        if(playerO.winner === false && playerX.winner === false){
-           if(!boardTiles.includes('')){
+        if(round === 9){
             end = true
-           } else{
-            end = false;
-           }
         }
 
         return end
@@ -119,6 +115,7 @@ const gameBoard = (function (document){
             }else{
                 roundFinish()
             }
+
 
         }
     }
@@ -147,41 +144,6 @@ const Player = (sign) => {
     let ownedTiles = [];
     let winner = false;
 
-    // const move = (tile) => {
-    //     if(gameBoard.getActivePlayer() === sign){
-
-    //         if(gameBoard.validateMove(tile)){
-                
-    //             ownedTiles.push(tile)
-
-    //             gameBoard.setTile(sign, tile)
-    //             displayController.renderBoard()
-    //             console.log(`${sign} takes tile ${tile+1}!`)
-
-    //             if(gameBoard.checkEnd() === 'o' || gameBoard.checkEnd() === 'x'){
-    //                 (gameBoard.checkEnd() === sign)? winner = true: winner = false;
-
-    //                 //displayController.win(sign)
-
-    //                 //gameBoard.reset()
-    //             } else if(gameBoard.checkEnd() === 'tie'){
-    //                 winner = false
-    //             }
-
-    //             gameBoard.roundFinish()
-
-    //         } else{
-
-    //             console.log('Invalid move')
-
-    //         }
-
-    //     } else if(!(gameBoard.getActivePlayer() === sign)) {
-
-    //         console.log(`Not ${sign}'s go!`)
-
-    //     }
-    //
     const reset = () => {
         ownedTiles.length = 0;
         console.log('reset tiles', ownedTiles)
@@ -246,7 +208,14 @@ const displayController = (function (){
         $endContainer.appendChild($h1)
 
         const $p = document.createElement('p')
-        $p.textContent = gameBoard.getWinner().sign.toUpperCase()+' wins!'
+
+        if(gameBoard.getWinner()=== null){
+            $p.textContent = 'Tie! Nobody wins.'
+        } else{
+            $p.textContent = gameBoard.getWinner().sign.toUpperCase()+' wins!'
+
+            gameBoard.getWinner().winner = false;
+        }
         $endContainer.appendChild($p)
 
         const $button = document.createElement('button')
